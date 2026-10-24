@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>AERO PROTOCOL // TRAVEL COMPANION</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;900&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #07090e;
+      --card-bg: #0f141c;
+      --border: #1e293b;
+      --accent: #38bdf8;
+      --accent-warn: #f59e0b;
+      --accent-green: #10b981;
+      --text: #f1f5f9;
+      --muted: #64748b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px 14px 40px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* الشريط العلوي */
+    .header-bar {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .hud-title { font-family: 'Space Mono', monospace; font-size: 0.85rem; color: var(--accent); letter-spacing: 1px; }
+    .status-badge { font-size: 0.7rem; color: var(--accent-green); display: flex; align-items: center; gap: 6px; }
+    .dot { width: 8px; height: 8px; background: var(--accent-green); border-radius: 50%; box-shadow: 0 0 8px var(--accent-green); }
+
+    /* لوحة حالة الرحلة والعد التنازلي */
+    .flight-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+    .flight-card::before {
+      content: '';
+      position: absolute;
+      top: 0; right: 0; left: 0; height: 3px;
+      background: linear-gradient(90deg, var(--accent), transparent);
+    }
+    .flight-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 12px;
+    }
+    .gate-number { font-family: 'Space Mono', monospace; font-size: 1.8rem; font-weight: 900; color: #fff; }
+    .countdown-timer { font-family: 'Space Mono', monospace; font-size: 1.4rem; color: var(--accent-warn); }
+    .meta-sub { font-size: 0.72rem; color: var(--muted); }
+
+    /* بطاقات المهام التكتيكية */
+    .tool-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .action-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .action-card:active { border-color: var(--accent); background: #131a24; }
+    .card-info h3 { font-size: 0.95rem; font-weight: 700; color: #fff; }
+    .card-info p { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+    .card-action-icon { font-size: 1.3rem; }
+
+    /* نموذج تثبيت موقع السيارة */
+    .parking-preview {
+      background: #080b10;
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 0.78rem;
+      color: var(--text);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* شاشات منبثقة بسيطة */
+    .overlay-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 999;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .modal-box {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 360px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .modal-box h4 { font-size: 1.1rem; color: #fff; }
+    .modal-input {
+      background: #080b10;
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      outline: none;
+    }
+    .modal-btn {
+      background: var(--accent);
+      color: #000;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- الشريط العلوي -->
+  <div class="header-bar">
+    <div class="hud-title">AERO PROTOCOL // TERMINAL</div>
+    <div class="status-badge"><div class="dot"></div> متصل بالمحطة</div>
+  </div>
+
+  <!-- لوحة البوابة ومؤقت الرحلة -->
+  <div class="flight-card">
+    <div class="flight-row">
+      <div>
+        <div class="meta-sub">بوابة الصعود (GATE)</div>
+        <div class="gate-number" id="gateVal">B-14</div>
+      </div>
+      <div style="text-align: left;">
+        <div class="meta-sub">إغلاق البوابة بعد</div>
+        <div class="countdown-timer" id="gateTimer">00:45:00</div>
+      </div>
+    </div>
+    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 10px;">
+      <span class="meta-sub" id="flightNo">رحلة رقم: SV-1020</span>
+      <span style="font-size: 0.75rem; color: var(--accent); cursor: pointer;" onclick="openFlightConfig()">تعديل البيانات ⚙️</span>
+    </div>
+  </div>
+
+  <!-- صندوق مواقف المطار -->
+  <div class="parking-preview">
+    <div>
+      <div style="color: var(--muted); font-size: 0.7rem;">مواقف المطار المحفوظة:</div>
+      <div id="parkingSlotLabel" style="font-weight: 700; font-family: 'Space Mono';">الدور 2 // عمود D-08</div>
+    </div>
+    <button onclick="saveCurrentAirportLocation()" style="background: transparent; border: 1px solid var(--border); color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; cursor: pointer;">تحديث النقطة 📍</button>
+  </div>
+
+  <!-- قائمة الأدوات التكتيكية للمسافر -->
+  <div class="tool-grid">
+    
+    <!-- زر بطاقة الصعود والجواز السريع -->
+    <div class="action-card" onclick="openBoardingPass()">
+      <div class="card-info">
+        <h3>وثائق السفر الفورية (Offline Vault)</h3>
+        <p>عرض تذكرة الصعود والجواز بدون الحاجة لإنترنت</p>
+      </div>
+      <div class="card-action-icon">🎫</div>
+    </div>
+
+    <!-- بطاقة عنوان الوجهة لسائق التاكسي -->
+    <div class="action-card" onclick="openDestinationCard()">
+      <div class="card-info">
+        <h3>عنوان الوجهة والفندق (Taxi Card)</h3>
+        <p>عرض عنوان الإقامة باللغة الإنجليزية والمحلية للسائق</p>
+      </div>
+      <div class="card-action-icon">🚖</div>
+    </div>
+
+    <!-- زر رادار المقتنيات والحقائب -->
+    <div class="action-card" onclick="openSafeTag()">
+      <div class="card-info">
+        <h3>وسم الحقائب والمفقودات (Safe Tag)</h3>
+        <p>وسيلة تواصل آمنة لمن يعثر على أمتعتك في الصالة</p>
+      </div>
+      <div class="card-action-icon">🧳</div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- نافذة تعديل بيانات الرحلة -->
+<div class="overlay-modal" id="flightModal">
+  <div class="modal-box">
+    <h4>تحديث بيانات الرحلة</h4>
+    <input type="text" id="inputFlightNo" class="modal-input" placeholder="رقم الرحلة (مثال: SV-1020)">
+    <input type="text" id="inputGate" class="modal-input" placeholder="رقم البوابة (مثال: B-14)">
+    <input type="number" id="inputMinutes" class="modal-input" placeholder="الدقائق المتبقية على البوابة">
+    <button class="modal-btn" onclick="saveFlightConfig()">حفظ البيانات</button>
+  </div>
+</div>
+
+<script>
+  // استرجاع البيانات المحفوظة
+  let gate = localStorage.getItem("AERO_GATE") || "B-14";
+  let flight = localStorage.getItem("AERO_FLIGHT") || "SV-1020";
+  let minutesLeft = parseInt(localStorage.getItem("AERO_MINS")) || 45;
+  let parkingSlot = localStorage.getItem("AERO_PARK") || "الدور 2 // عمود D-08";
+
+  document.getElementById("gateVal").innerText = gate;
+  document.getElementById("flightNo").innerText = `رحلة رقم: ${flight}`;
+  document.getElementById("parkingSlotLabel").innerText = parkingSlot;
+
+  // تشغيل عداد البوابة
+  let totalSeconds = minutesLeft * 60;
+  setInterval(() => {
+    if (totalSeconds > 0) {
+      totalSeconds--;
+      const h = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+      const m = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+      const s = String(totalSeconds % 60).padStart(2, '0');
+      document.getElementById("gateTimer").innerText = `${h}:${m}:${s}`;
+    } else {
+      document.getElementById("gateTimer").innerText = "CLOSED";
+      document.getElementById("gateTimer").style.color = "#ef4444";
+    }
+  }, 1000);
+
+  function openFlightConfig() {
+    document.getElementById("inputFlightNo").value = flight;
+    document.getElementById("inputGate").value = gate;
+    document.getElementById("flightModal").style.display = "flex";
+  }
+
+  function saveFlightConfig() {
+    flight = document.getElementById("inputFlightNo").value || flight;
+    gate = document.getElementById("inputGate").value || gate;
+    const mins = document.getElementById("inputMinutes").value;
+    if (mins) totalSeconds = parseInt(mins) * 60;
+
+    localStorage.setItem("AERO_FLIGHT", flight);
+    localStorage.setItem("AERO_GATE", gate);
+
+    document.getElementById("gateVal").innerText = gate;
+    document.getElementById("flightNo").innerText = `رحلة رقم: ${flight}`;
+    document.getElementById("flightModal").style.display = "none";
+  }
+
+  function saveCurrentAirportLocation() {
+    const loc = prompt("سجل رقم الدور وموقع العمود في مواقف المطار:", parkingSlot);
+    if (loc) {
+      parkingSlot = loc;
+      localStorage.setItem("AERO_PARK", loc);
+      document.getElementById("parkingSlotLabel").innerText = loc;
+    }
+  }
+
+  function openBoardingPass() {
+    alert("عرض التذكرة السريعة: يمكنك ربط هذا الزر بصورة الباركود المحفوظة بجهازك.");
+  }
+
+  function openDestinationCard() {
+    alert("عنوان الفندق: تم تجهيز الكرت لعرض العنوان لسائق التاكسي مباشرة باللغة الإنجليزية.");
+  }
+
+  function openSafeTag() {
+    alert("بطاقة الحقائب: تعرض رقم هاتفك المشفر للمساعدة في استعادة الحقيبة.");
+  }
+</script>
+
+</body>
+</html>
