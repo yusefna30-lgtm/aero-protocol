@@ -80,19 +80,6 @@
     .gate-status-text { font-family: 'Space Mono', monospace; font-size: 1.05rem; font-weight: 800; }
     .meta-sub { font-size: 0.72rem; color: var(--muted); }
 
-    /* صندوق مواقف المطار */
-    .parking-preview {
-      background: #080b10;
-      border: 1px dashed var(--border);
-      border-radius: 10px;
-      padding: 10px 12px;
-      font-size: 0.78rem;
-      color: var(--text);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
     /* قائمة الأدوات التكتيكية */
     .tool-grid {
       display: flex;
@@ -115,6 +102,50 @@
     .card-info h3 { font-size: 0.95rem; font-weight: 700; color: #fff; }
     .card-info p { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
     .card-action-icon { font-size: 1.3rem; }
+
+    /* صندوق مواقف المطار في الأسفل */
+    .parking-preview {
+      background: #080b10;
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 0.8rem;
+      color: var(--text);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 4px;
+    }
+
+    /* حقوق المطور */
+    .developer-footer {
+      margin-top: 18px;
+      text-align: center;
+      padding: 12px;
+      border-top: 1px solid #131b26;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .dev-label {
+      font-size: 0.68rem;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
+    .dev-name {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #94a3b8;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .dev-name span {
+      color: var(--accent);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
+    }
 
     /* النوافذ المنبثقة */
     .overlay-modal {
@@ -212,16 +243,7 @@
     </div>
   </div>
 
-  <!-- صندوق مواقف المطار -->
-  <div class="parking-preview">
-    <div>
-      <div style="color: var(--muted); font-size: 0.7rem;">مواقف المطار المحفوظة:</div>
-      <div id="parkingSlotLabel" style="font-weight: 700; font-family: 'Space Mono';">الدور 2 // عمود D-08</div>
-    </div>
-    <button onclick="saveCurrentAirportLocation()" style="background: transparent; border: 1px solid var(--border); color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; cursor: pointer;">تحديث النقطة 📍</button>
-  </div>
-
-  <!-- قائمة الأدوات التكتيكية -->
+  <!-- قائمة الأدوات التكتيكية الأساسية -->
   <div class="tool-grid">
     
     <!-- 1. وثائق السفر الفورية -->
@@ -233,7 +255,7 @@
       <div class="card-action-icon">🎫</div>
     </div>
 
-    <!-- 2. بطاقة عنوان الوجهة لسائق التاكسي (نص + صورة) -->
+    <!-- 2. بطاقة عنوان الوجهة لسائق التاكسي -->
     <div class="action-card" onclick="openDestinationCard()">
       <div class="card-info">
         <h3>عنوان الوجهة والفندق (Taxi Card)</h3>
@@ -253,9 +275,26 @@
 
   </div>
 
+  <!-- صندوق مواقف المطار (في الأسفل) -->
+  <div class="parking-preview">
+    <div>
+      <div style="color: var(--muted); font-size: 0.7rem;">مواقف المطار المحفوظة:</div>
+      <div id="parkingSlotLabel" style="font-weight: 700; font-family: 'Space Mono';">الدور 2 // عمود D-08</div>
+    </div>
+    <button onclick="saveCurrentAirportLocation()" style="background: #131b26; border: 1px solid var(--border); color: #fff; padding: 7px 12px; border-radius: 8px; font-size: 0.75rem; cursor: pointer;">تحديث النقطة 📍</button>
+  </div>
+
+  <!-- شريط المطور نبيل النمر -->
+  <div class="developer-footer">
+    <div class="dev-label">SYSTEM ARCHITECTURE // PROTOCOL SPEC</div>
+    <div class="dev-name">
+      إعداد وتطوير: نبيل النمر <span>[ NABIL AL-NAMER ]</span>
+    </div>
+  </div>
+
 </div>
 
-<!-- عناصر مخفية: رفع الصور من ألبوم الصور -->
+<!-- عناصر مخفية: رفع الصور -->
 <input type="file" id="ticketFileInput" accept="image/*" style="display: none;" onchange="handleTicketUpload(event)">
 <input type="file" id="hotelCardFileInput" accept="image/*" style="display: none;" onchange="handleHotelCardUpload(event)">
 
@@ -280,17 +319,15 @@
   </div>
 </div>
 
-<!-- نافذة بطاقة التاكسي (نص + صورة كرت الفندق) -->
+<!-- نافذة بطاقة التاكسي (نص + صورة) -->
 <div class="overlay-modal" id="taxiModal">
   <div class="modal-box">
     <h4>بطاقة سائق التاكسي (TAXI CARD)</h4>
     
-    <!-- معاينة صورة كرت الفندق إن وجدت -->
     <div id="hotelImgContainer" style="display: none; width: 100%; border: 1px solid var(--accent); border-radius: 10px; overflow: hidden; max-height: 200px; background: #000;">
       <img id="hotelImgPreview" src="" style="width: 100%; height: 100%; object-fit: cover;" onclick="viewFullHotelImg()">
     </div>
 
-    <!-- العنوان النصي -->
     <div style="background: #080b10; border: 1px solid var(--border); border-radius: 8px; padding: 12px;">
       <div style="font-size: 0.7rem; color: var(--muted); margin-bottom: 4px;">HOTEL / DESTINATION ADDRESS:</div>
       <div id="hotelDisplay" style="font-size: 1.05rem; font-weight: 800; color: #fff; line-height: 1.4; font-family: 'Space Mono', sans-serif;">
@@ -345,7 +382,6 @@
     document.getElementById("passengerIdDisplay").innerText = passengerCode;
     document.getElementById("tagFlightDisplay").innerText = flight;
 
-    // استرجاع صورة كرت الفندق إن وجدت
     const hotelImg = localStorage.getItem("AERO_HOTEL_IMG");
     if (hotelImg) {
       document.getElementById("hotelImgPreview").src = hotelImg;
@@ -412,7 +448,6 @@
     }
   }
 
-  // 1. تذكرة الصعود
   function openBoardingPass() {
     const savedImg = localStorage.getItem("AERO_TICKET_IMG");
     if (savedImg) {
@@ -441,7 +476,6 @@
     }
   }
 
-  // 2. كرت الفندق والتاكسي (رفع صورة + عرض ملء الشاشة)
   function openDestinationCard() {
     document.getElementById("taxiModal").style.display = "flex";
   }
@@ -481,7 +515,6 @@
     }
   }
 
-  // 3. وسم المفقودات
   function openSafeTag() {
     document.getElementById("tagModal").style.display = "flex";
   }
